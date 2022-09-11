@@ -18,6 +18,7 @@ public class TankMovement : MonoBehaviour
     private float m_TurnInputValue;        
     private float m_OriginalPitch;         
 
+    private Joystick joystick;
 
     private void Awake()
     {
@@ -45,6 +46,8 @@ public class TankMovement : MonoBehaviour
         m_TurnAxisName = "Horizontal" + m_PlayerNumber;
 
         m_OriginalPitch = m_MovementAudio.pitch;
+
+        joystick = GameObject.FindGameObjectWithTag("Joystick").GetComponent<Joystick>();
     }
     
 
@@ -54,6 +57,10 @@ public class TankMovement : MonoBehaviour
         m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
         
+        if(m_PlayerNumber == 1) {
+            m_MovementInputValue = joystick.Vertical;
+            m_TurnInputValue = joystick.Horizontal;
+        }
         EngineAudio();
     }
 

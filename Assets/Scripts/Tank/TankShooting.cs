@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class TankShooting : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class TankShooting : MonoBehaviour
     private float m_ChargeSpeed;         
     private bool m_Fired;                
 
+    private FireReleaser fireReleaser;
 
     private void OnEnable()
     {
@@ -32,20 +34,22 @@ public class TankShooting : MonoBehaviour
         m_FireButton = "Fire" + m_PlayerNumber;
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
+        fireReleaser = GameObject.FindGameObjectWithTag("FireReleaser").GetComponent<FireReleaser>();
     }
-
 
     private void Update()
     {
         // Track the current state of the fire button and make decisions based on the current launch force.
         m_AimSlider.value = m_MinLaunchForce;
 
+        bool androidFiring = fireReleaser.shooting && m_PlayerNumber == 1;
+
         if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
         {   
             // at max charge, not yet fired
             m_CurrentLaunchForce = m_MaxLaunchForce;
             Fire();
-        } else if(Input.GetButtonDown(m_FireButton)){
+        } else if(Input.GetButtonDown(m_FireButton) || androidFiring) {
             // have we pressed fire for the first time?
             m_Fired = false;
             m_CurrentLaunchForce = m_MinLaunchForce;
@@ -53,13 +57,13 @@ public class TankShooting : MonoBehaviour
             m_ShootingAudio.clip = m_ChargingClip;
             m_ShootingAudio.Play();
 
-        } else if(Input.GetButton(m_FireButton) && !m_Fired){
+        } else if((Input.GetButton(m_FireButton) || androidFiring) && !m_Fired){
             // Holding the fire button, not yet fired
             m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
             m_AimSlider.value = m_CurrentLaunchForce;
 
-        } else if(Input.GetButtonUp(m_FireButton) && !m_Fired){
+        } else if((Input.GetButtonUp(m_FireButton) || !androidFiring) && !m_Fired){
             // we released the button, having not fired yet
             Fire();
         }
