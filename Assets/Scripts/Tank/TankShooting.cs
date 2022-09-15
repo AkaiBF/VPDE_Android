@@ -83,5 +83,6 @@ public class TankShooting : MonoBehaviour
         m_ShootingAudio.Play();
         
         m_CurrentLaunchForce = m_MinLaunchForce;
+        Handheld.Vibrate();
     }
 }
